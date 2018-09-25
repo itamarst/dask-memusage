@@ -1,9 +1,9 @@
-"""Task-level memory profiling.
+"""Low-impact, task-level memory profiling for Dask.
 
 Usage:
 
-    plugin = MemoryUsagePlugin("/tmp/memory_usage.csv")
-    scheduler.add_plugin(plugin)
+    from dask_memoryusage import install
+    install(scheduler)
 """
 
 import os
@@ -15,9 +15,10 @@ from psutil import Process
 
 from distributed.diagnostics.plugin import SchedulerPlugin
 from distributed.client import Client
+from distributed.scheduler import Scheduler
 
 
-__all__ = ["MemoryUsagePlugin"]
+__all__ = ["install"]
 __version__ = "1.0"
 
 
@@ -98,3 +99,13 @@ class MemoryUsagePlugin(SchedulerPlugin):
             max_memory_usage = max(memory_usage)
             min_memory_usage = min(memory_usage)
             self._csv.writerow([key, min_memory_usage, max_memory_usage])
+
+
+def install(scheduler: Scheduler, csv_path: str):
+    """Register the memory usage profiler with a distributed Scheduler.
+
+    :param scheduler: The Distributed Scheduler to register with.
+    :param csv_path: The filesystem path where the CSV file will be written.
+    """
+    plugin = MemoryUsagePlugin(scheduler, csv_path)
+    scheduler.add_plugin(plugin)

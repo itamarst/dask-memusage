@@ -9,7 +9,7 @@ from dask.bag import from_sequence
 from dask import compute
 from dask.distributed import Client, LocalCluster
 
-from dask_memusage import MemoryUsagePlugin
+from dask_memusage import install
 
 
 def allocate_50mb(x):
@@ -34,7 +34,7 @@ def test_highlevel_python_usage(tmpdir):
     tempfile = os.path.join(tmpdir, "out.csv")
     cluster = LocalCluster(n_workers=2, threads_per_worker=1,
                            memory_limit=None)
-    cluster.scheduler.add_plugin(MemoryUsagePlugin(cluster.scheduler, tempfile))
+    install(cluster.scheduler, tempfile)
     client = Client(cluster)
     compute(make_bag())
 
