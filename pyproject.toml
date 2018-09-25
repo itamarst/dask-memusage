@@ -4,8 +4,8 @@ build-backend = "flit.buildapi"
 
 [tool.flit.metadata]
 module = "dask_memusage"
-requires-python = "3"
 description-file = "README.md"
+requires-python = ">=3.5"
 requires = [
     "distributed",
     "click",
