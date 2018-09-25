@@ -95,6 +95,6 @@ def check_csv(csv_file):
     print(result)
     assert "sum-part" in result[0][0]
     assert "sum-part" in result[1][0]
-    assert 60 > result[0][1] > 49
-    assert 60 > result[1][1] > 49
+    assert 70 > result[0][1] > 49
+    assert 70 > result[1][1] > 49
     assert "no_allocate" in result[2][0]
