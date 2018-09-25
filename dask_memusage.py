@@ -1,9 +1,14 @@
 """Low-impact, task-level memory profiling for Dask.
 
-Usage:
+API usage:
 
     from dask_memoryusage import install
     install(scheduler)
+
+CLI usage:
+
+    dask-scheduler --preload dask_memusage --memusage.csv /tmp/memusage.csv
+
 """
 
 import os
@@ -11,7 +16,9 @@ import csv
 from time import sleep
 from threading import Lock, Thread
 from collections import defaultdict
+
 from psutil import Process
+import click
 
 from distributed.diagnostics.plugin import SchedulerPlugin
 from distributed.client import Client
@@ -38,9 +45,7 @@ class _WorkerMemory(object):
     """Track memory usage by each worker."""
 
     def __init__(self, scheduler_address):
-        # This is a little silly: we're opening client to this process... not
-        # sure how else to do it though.
-        self._client = Client(scheduler_address)
+        self._scheduler_address = scheduler_address
         self._lock = Lock()
         self._worker_memory = defaultdict(list)
 
@@ -52,8 +57,9 @@ class _WorkerMemory(object):
 
     def _fetch_memory(self):
         """Retrieve worker memory every 10ms."""
+        client = Client(self._scheduler_address, timeout=30)
         while True:
-            worker_to_mem = self._client.run(_process_memory)
+            worker_to_mem = client.run(_process_memory)
             with self._lock:
                 for worker, mem in worker_to_mem.items():
                     self._worker_memory[worker].append(mem)
@@ -109,3 +115,10 @@ def install(scheduler: Scheduler, csv_path: str):
     """
     plugin = MemoryUsagePlugin(scheduler, csv_path)
     scheduler.add_plugin(plugin)
+
+
+
+@click.command()
+@click.option("--memusage-csv", default="memusage.csv")
+def dask_setup(scheduler, memusage_csv):
+    install(scheduler, memusage_csv)

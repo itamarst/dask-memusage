@@ -6,6 +6,7 @@ build-backend = "flit.buildapi"
 module = "dask_memusage"
 requires = [
     "distributed",
+    "click",
 ]
 author = "Itamar Turner-Trauring"
 author-email = "itamar@itamarst.org"
@@ -13,4 +14,11 @@ home-page = "https://github.com/itamarst/dask-memusage"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
+]
+
+[tool.flit.metadata.requires-extra]
+test = [
+    "pytest",
+    "flake8",
+    "numpy"
 ]
