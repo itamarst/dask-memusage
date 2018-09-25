@@ -123,7 +123,6 @@ def install(scheduler: Scheduler, csv_path: str):
     scheduler.add_plugin(plugin)
 
 
-
 @click.command()
 @click.option("--memusage-csv", default="memusage.csv")
 def dask_setup(scheduler, memusage_csv):
