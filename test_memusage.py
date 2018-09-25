@@ -10,7 +10,7 @@ from dask.bag import from_sequence
 from dask import compute
 from dask.distributed import Client, LocalCluster
 
-from dask_memusage import install
+from dask_memusage import install, _WorkerMemory
 
 
 def allocate_50mb(x):
@@ -30,6 +30,22 @@ def make_bag():
     return from_sequence(
         [1, 2], npartitions=2
     ).map(allocate_50mb).sum().apply(no_allocate)
+
+
+def test_workermemory():
+    """_WorkerMemory adds memory per-worker and removes it per-worker.
+
+    If no info is known, we just get 0.
+    """
+    wm = _WorkerMemory("")
+    assert wm.memory_for_task("123") == [0]
+    wm._add_memory("123", 7)
+    wm._add_memory("456", 3)
+    wm._add_memory("123", 8)
+    assert wm.memory_for_task("123") == [7, 8]
+    assert wm.memory_for_task("456") == [3]
+    assert wm.memory_for_task("123") == [0]
+    assert wm.memory_for_task("456") == [0]
 
 
 def test_highlevel_python_usage(tmpdir):

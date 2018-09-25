@@ -55,6 +55,10 @@ class _WorkerMemory(object):
         t.setDaemon(True)
         t.start()
 
+    def _add_memory(self, worker_address, mem):
+        """Record memory timepoint for a worker."""
+        self._worker_memory[worker_address].append(mem)
+
     def _fetch_memory(self):
         """Retrieve worker memory every 10ms."""
         client = Client(self._scheduler_address, timeout=30)
@@ -62,7 +66,7 @@ class _WorkerMemory(object):
             worker_to_mem = client.run(_process_memory)
             with self._lock:
                 for worker, mem in worker_to_mem.items():
-                    self._worker_memory[worker].append(mem)
+                    self._add_memory(worker, mem)
             sleep(0.01)
 
     def memory_for_task(self, worker_address):
@@ -72,6 +76,8 @@ class _WorkerMemory(object):
         """
         with self._lock:
             result = self._worker_memory[worker_address]
+            if not result:
+                result = [0]
             del self._worker_memory[worker_address]
             return result
 
