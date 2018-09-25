@@ -3,7 +3,7 @@
 API usage:
 
     from dask_memoryusage import install
-    install(scheduler)
+    install(scheduler, "/tmp/memusage.csv")
 
 CLI usage:
 

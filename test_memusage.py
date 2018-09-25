@@ -84,6 +84,8 @@ def test_commandline_usage(tmpdir):
 
 def check_csv(csv_file):
     """Make sure CSV contains appropriate information."""
+    with open(csv_file) as f:
+        print(f.read())
     result = []
     with open(csv_file) as f:
         csv = DictReader(f)
@@ -92,7 +94,6 @@ def check_csv(csv_file):
                 result.append(
                     (row["task_key"],
                      float(row["max_memory_mb"]) - float(row["min_memory_mb"])))
-    print(result)
     assert "sum-part" in result[0][0]
     assert "sum-part" in result[1][0]
     assert 70 > result[0][1] > 49
