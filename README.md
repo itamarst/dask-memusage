@@ -31,6 +31,14 @@ apply-no_allocate-4c30eb545d4c778f0320d973d9fc8ea6,47.265625,47.265625
 
 *Important:* Make sure your workers only have a single thread! Otherwise the results will be wrong.
 
+### Installation
+
+On the machine where you are running the Distributed scheduler, run:
+
+```console
+$ pip install dask_memusage
+```
+
 ### API usage
 
 ```python
