@@ -81,17 +81,13 @@ class MemoryUsagePlugin(SchedulerPlugin):
 
     * Statistical profiling at 10ms resolution.
     """
-    def __init__(self, csv_path):
+    def __init__(self, scheduler, csv_path):
         SchedulerPlugin.__init__(self)
         f = open(os.path.join(csv_path), "w", buffering=1)
         self._csv = csv.writer(f)
         self._csv.writerow(["task_key", "min_memory_mb", "max_memory_mb"])
-        self._worker_memory = None
-
-    def reset(self, scheduler):
-        if self._worker_memory is None:
-            self._worker_memory = _WorkerMemory(scheduler.address)
-            self._worker_memory.start()
+        self._worker_memory = _WorkerMemory(scheduler.address)
+        self._worker_memory.start()
 
     def transition(self, key, start, finish, *args, **kwargs):
         """Called by the Scheduler every time a task changes status."""
