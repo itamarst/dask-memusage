@@ -39,6 +39,12 @@ On the machine where you are running the Distributed scheduler, run:
 $ pip install dask_memusage
 ```
 
+Or if you're using Conda:
+
+``console
+$ conda install -c conda-forge dask-memusage
+```
+
 ### API usage
 
 ```python
