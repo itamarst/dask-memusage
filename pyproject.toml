@@ -22,5 +22,6 @@ classifiers = [
 test = [
     "pytest",
     "flake8",
-    "numpy"
+    "numpy",
+    "dask[bag]"
 ]
