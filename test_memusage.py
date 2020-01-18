@@ -90,12 +90,14 @@ def check_csv(csv_file):
     with open(csv_file) as f:
         csv = DictReader(f)
         for row in csv:
-            if "from_sequence" in row["task_key"] or "no_allocate" in row["task_key"]:
+            if "allocate" in row["task_key"]:
                 result.append(
                     (row["task_key"],
                      float(row["max_memory_mb"]) - float(row["min_memory_mb"])))
+    assert len(result) == 3
     assert "sum-part" in result[0][0]
     assert "sum-part" in result[1][0]
     assert 70 > result[0][1] > 49
     assert 70 > result[1][1] > 49
     assert "no_allocate" in result[2][0]
+    assert 1 > result[2][1] >= 0
