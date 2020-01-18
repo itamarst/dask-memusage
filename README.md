@@ -41,7 +41,7 @@ $ pip install dask_memusage
 
 Or if you're using Conda:
 
-``console
+```console
 $ conda install -c conda-forge dask-memusage
 ```
 
