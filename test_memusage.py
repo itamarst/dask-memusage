@@ -87,17 +87,17 @@ def check_csv(csv_file):
     with open(csv_file) as f:
         print(f.read())
     result = []
+    found_50mb = 0
+    found_0mb = 0
     with open(csv_file) as f:
         csv = DictReader(f)
         for row in csv:
-            if "allocate" in row["task_key"]:
-                result.append(
-                    (row["task_key"],
-                     float(row["max_memory_mb"]) - float(row["min_memory_mb"])))
-    assert len(result) == 3
-    assert "sum-part" in result[0][0]
-    assert "sum-part" in result[1][0]
-    assert 70 > result[0][1] > 49
-    assert 70 > result[1][1] > 49
-    assert "no_allocate" in result[2][0]
-    assert 1 > result[2][1] >= 0
+            allocated = float(row["max_memory_mb"]) - float(row["min_memory_mb"])
+            if "allocate_50mb" in row["task_key"]:
+                assert 70 > allocated > 49
+                found_50mb += 1
+            elif "no_allocate" in row["task_key"]:
+                assert 1 > allocated >= 0
+                found_0mb += 1
+    assert found_50mb >= 2
+    assert found_0mb >= 1
