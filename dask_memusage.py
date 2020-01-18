@@ -26,7 +26,7 @@ from distributed.scheduler import Scheduler
 
 
 __all__ = ["install"]
-__version__ = "1.0"
+__version__ = "1.1"
 
 
 def _process_memory():
