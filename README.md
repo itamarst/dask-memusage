@@ -54,6 +54,24 @@ from dask_memusage import install
 install(scheduler, "/tmp/memusage.csv")
 ```
 
+### Dask API usage
+
+Here's an example using Dask with local cluster created on the fly:
+
+```python
+from dask.distributed import LocalCluster, Client
+from dask import compute
+from dask_memusage import install
+
+cluster = LocalCluster(n_workers=2, threads_per_worker=1,
+                            memory_limit=None)
+install(cluster.scheduler, tempfile)
+client = Client(cluster)
+
+# Normal Dask computation:
+compute(your_code_that_makes_bag_or_something())
+```
+
 ### CLI usage
 
 ```console
