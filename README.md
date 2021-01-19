@@ -50,7 +50,7 @@ $ conda install -c conda-forge dask-memusage
 ```python
 # Add to your Scheduler object, which is e.g. your LocalCluster's scheduler
 # attribute:
-from dask_memoryusage import install
+from dask_memusage import install
 install(scheduler, "/tmp/memusage.csv")
 ```
 
