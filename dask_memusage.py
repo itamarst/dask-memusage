@@ -22,7 +22,7 @@ import click
 
 from distributed.diagnostics.plugin import SchedulerPlugin
 from distributed.client import Client
-from distributed.scheduler import Scheduler
+from distributed import Scheduler
 
 
 __all__ = ["install"]
@@ -125,5 +125,6 @@ def install(scheduler: Scheduler, csv_path: str):
 
 @click.command()
 @click.option("--memusage-csv", default="memusage.csv")
-def dask_setup(scheduler, memusage_csv):
+def dask_setup(scheduler : Scheduler, memusage_csv):
+    assert isinstance(scheduler, Scheduler)
     install(scheduler, memusage_csv)
