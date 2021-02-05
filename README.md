@@ -27,7 +27,7 @@ sum-aggregate-apply-no_allocate-4c30eb545d4c778f0320d973d9fc8ea6,0,0
 apply-no_allocate-4c30eb545d4c778f0320d973d9fc8ea6,47.265625,47.265625
 ```
 
-You may also find the [Fil memroy profiler](https://pythonspeed.com/fil) in tracking down which specific parts of your code are responsible for peak memory allocations.
+You may also find the [Fil memory profiler](https://pythonspeed.com/fil) useful in tracking down which specific parts of your code are responsible for peak memory allocations.
 
 ## Usage
 
