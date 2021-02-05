@@ -8,7 +8,7 @@ That means you want to know how much memory each task uses:
 
 `dask-memusage` is an MIT-licensed statistical memory profiler for Dask's Distributed scheduler that can help you with both these problems.
 
-`dask-memusage` polls your processes for memory usage and records the minimum and maximum usage in a CSV:
+`dask-memusage` polls your processes for memory usage and records the minimum and maximum usage for each task in the Dask execution graph in a CSV:
 
 ```csv
 task_key,min_memory_mb,max_memory_mb
@@ -26,6 +26,8 @@ task_key,min_memory_mb,max_memory_mb
 sum-aggregate-apply-no_allocate-4c30eb545d4c778f0320d973d9fc8ea6,0,0
 apply-no_allocate-4c30eb545d4c778f0320d973d9fc8ea6,47.265625,47.265625
 ```
+
+You may also find the [Fil memroy profiler](https://pythonspeed.com/fil) in tracking down which specific parts of your code are responsible for peak memory allocations.
 
 ## Usage
 
