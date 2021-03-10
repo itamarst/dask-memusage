@@ -29,6 +29,47 @@ apply-no_allocate-4c30eb545d4c778f0320d973d9fc8ea6,47.265625,47.265625
 
 You may also find the [Fil memory profiler](https://pythonspeed.com/fil) useful in tracking down which specific parts of your code are responsible for peak memory allocations.
 
+## Example
+
+Here's a working standalone program using `dask-memusage`; notice you just need to add two lines of code:
+
+```python
+from time import sleep
+import numpy as np
+from dask.bag import from_sequence
+from dask import compute
+from dask.distributed import Client, LocalCluster
+
+from dask_memusage import install  # <-- IMPORT
+
+def allocate_50mb(x):
+    """Allocate 50MB of RAM."""
+    sleep(1)
+    arr = np.ones((50, 1024, 1024), dtype=np.uint8)
+    sleep(1)
+    return x * 2
+
+def no_allocate(y):
+    """Don't allocate any memory."""
+    return y * 2
+
+def make_bag():
+    """Create a bag."""
+    return from_sequence(
+        [1, 2], npartitions=2
+    ).map(allocate_50mb).sum().apply(no_allocate)
+
+def main():
+    cluster = LocalCluster(n_workers=2, threads_per_worker=1,
+                           memory_limit=None)
+    install(cluster.scheduler, "memusage.csv")  # <-- INSTALL
+    client = Client(cluster)
+    compute(make_bag())
+
+if __name__ == '__main__':
+    main()
+```
+
 ## Usage
 
 *Important:* Make sure your workers only have a single thread! Otherwise the results will be wrong.
