@@ -22,7 +22,7 @@ import click
 
 from distributed.diagnostics.plugin import SchedulerPlugin
 from distributed.client import Client
-from distributed.scheduler import Scheduler
+from distributed import Scheduler
 
 
 __all__ = ["install"]
@@ -35,10 +35,12 @@ def _process_memory():
     We include memory used by subprocesses.
     """
     proc = Process(os.getpid())
-    return sum([
-        p.memory_info().rss / (1024 * 1024)
-        for p in [proc] + list(proc.children(recursive=True))
-    ])
+    return sum(
+        [
+            p.memory_info().rss / (1024 * 1024)
+            for p in [proc] + list(proc.children(recursive=True))
+        ]
+    )
 
 
 class _WorkerMemory(object):
@@ -94,6 +96,7 @@ class MemoryUsagePlugin(SchedulerPlugin):
 
     * Statistical profiling at 10ms resolution.
     """
+
     def __init__(self, scheduler, csv_path):
         SchedulerPlugin.__init__(self)
         f = open(os.path.join(csv_path), "w", buffering=1)
@@ -125,5 +128,6 @@ def install(scheduler: Scheduler, csv_path: str):
 
 @click.command()
 @click.option("--memusage-csv", default="memusage.csv")
-def dask_setup(scheduler, memusage_csv):
+def dask_setup(scheduler: Scheduler, memusage_csv):
+    assert isinstance(scheduler, Scheduler)
     install(scheduler, memusage_csv)
