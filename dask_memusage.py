@@ -16,6 +16,7 @@ import csv
 from time import sleep
 from threading import Lock, Thread
 from collections import defaultdict
+from functools import reduce
 
 from psutil import Process
 import click
@@ -26,19 +27,30 @@ from distributed.scheduler import Scheduler
 
 
 __all__ = ["install"]
-__version__ = "1.1"
+__version__ = "1.2"
 
 
-def _process_memory():
+def _process_memory() -> tuple:
     """Return process memory usage, in MB.
 
-    We include memory used by subprocesses.
+    We include memory used by subprocesses and GPU usage (default=False).
     """
     proc = Process(os.getpid())
-    return sum([
+
+    gpu_mem = 0
+
+    try:
+        # Import here to avoid GPUtil installed in scheduler
+        import GPUtil
+
+        gpu_mem = sum([gpu.memoryUsed for gpu in GPUtil.getGPUs()])
+    except:
+        pass
+
+    return (sum([
         p.memory_info().rss / (1024 * 1024)
         for p in [proc] + list(proc.children(recursive=True))
-    ])
+    ]), gpu_mem)
 
 
 class _WorkerMemory(object):
@@ -77,7 +89,7 @@ class _WorkerMemory(object):
         with self._lock:
             result = self._worker_memory[worker_address]
             if not result:
-                result = [0]
+                result = [(0, 0)]
             del self._worker_memory[worker_address]
             return result
 
@@ -98,7 +110,8 @@ class MemoryUsagePlugin(SchedulerPlugin):
         SchedulerPlugin.__init__(self)
         f = open(os.path.join(csv_path), "w", buffering=1)
         self._csv = csv.writer(f)
-        self._csv.writerow(["task_key", "min_memory_mb", "max_memory_mb"])
+        self._csv.writerow(["task_key", "min_memory_mb", "max_memory_mb",
+                            "min_memory_gpu_mb", "max_memory_gpu_mb"])
         self._worker_memory = _WorkerMemory(scheduler.address)
         self._worker_memory.start()
 
@@ -108,9 +121,16 @@ class MemoryUsagePlugin(SchedulerPlugin):
         if start == "processing" and finish in ("memory", "erred"):
             worker_address = kwargs["worker"]
             memory_usage = self._worker_memory.memory_for_task(worker_address)
-            max_memory_usage = max(memory_usage)
-            min_memory_usage = min(memory_usage)
-            self._csv.writerow([key, min_memory_usage, max_memory_usage])
+            max_memory_usage = reduce(lambda x, y: max(x, y[0]),
+                                      memory_usage, float("-inf"))
+            min_memory_usage = reduce(lambda x, y: min(x, y[0]),
+                                      memory_usage, float("inf"))
+            max_memory_gpu_usage = reduce(lambda x, y: max(x, y[1]),
+                                          memory_usage, float("-inf"))
+            min_memory_gpu_usage = reduce(lambda x, y: min(x, y[1]),
+                                          memory_usage, float("inf"))
+            self._csv.writerow([key, min_memory_usage, max_memory_usage,
+                                min_memory_gpu_usage, max_memory_gpu_usage])
 
 
 def install(scheduler: Scheduler, csv_path: str):

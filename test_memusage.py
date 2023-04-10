@@ -57,6 +57,7 @@ def test_highlevel_python_usage(tmpdir):
     client = Client(cluster)
     compute(make_bag())
     check_csv(tempfile)
+    client.shutdown()
 
 
 def test_commandline_usage(tmpdir):
@@ -77,6 +78,7 @@ def test_commandline_usage(tmpdir):
         client = Client("tcp://127.0.0.1:3333")
         compute(make_bag())
         check_csv(tempfile)
+        client.shutdown()
     finally:
         worker.kill()
         scheduler.kill()
